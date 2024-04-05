@@ -12,6 +12,7 @@ def read_sequences_from_file(filename):
 def greedy(sequences, full_sequence_length):
     sequence = random.choice(sequences)
     sequences.remove(sequence)
+    sequences_used = 1
     while len(sequence) < full_sequence_length:
         print(len(sequence))
         next_sequence, overlaping_next = find_best_next_sequence(sequence, sequences)
@@ -19,12 +20,16 @@ def greedy(sequences, full_sequence_length):
         if overlaping_next > 0:
             sequence += next_sequence[overlaping_next:]
             sequences.remove(next_sequence)
+            sequences_used += 1
         if overlaping_prev > 0:
             sequence = prev_sequence[:overlaping_prev] + sequence
             sequences.remove(prev_sequence)
+            sequences_used += 1
         if not overlaping_prev and not overlaping_next:
             return sequence
     print(len(sequence))
+    coverage = sequences_used * 10 / len(sequence)
+    print("Coverage: ", coverage)
     return sequence
 
 
@@ -59,7 +64,7 @@ def find_best_prev_sequence(sequence, sequences):
 
 
 if __name__ == "__main__":
-    data = read_sequences_from_file("sequences_positive.txt")
+    data = read_sequences_from_file("sequences_negative.txt")
     print(data)
     print(compare_next_sequences("abc", "bcd"))
     print(find_best_next_sequence("abc", ["bcd", "cde", "def", "efg", "fgh", "ghi", "hij", "ijk", "jkl", "klm", "lmn", "mno", "nop", "opq", "pqr", "qrs", "rst", "stu", "tuv", "uvw", "vwx", "wxy", "xyz", "yza", "zab"]))
