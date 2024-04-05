@@ -18,14 +18,14 @@ def create_graph(seqs):
             graph[seq] = Node(seq)
 
     for node in graph.values():
-        node.check_next(graph)
+        node.check_next(graph, l=10) # l - words length
     
     return graph
 
 
 if __name__ == '__main__':
     # Wczytaj sekwencje z pliku
-    filename = 'sequences_positive.txt'  # nazwa pliku z sekwencjami
+    filename = 'sequences_negative.txt'  # nazwa pliku z sekwencjami
     sequences = read_sequences_from_file(filename)
 
     # Stwórz graf
