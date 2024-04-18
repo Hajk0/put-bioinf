@@ -12,12 +12,12 @@ def read_sequences_from_file(filename):
 def greedy(sequences, full_sequence_length):
     sequence = random.choice(sequences)
     sequences.remove(sequence)
+    chromosome = []
     sequences_used = 1
     coverage = 0
     prev_len = 0
     prev_prev_len = 0
     while len(sequence) < full_sequence_length:
-        print(len(sequence))
         if prev_len == len(sequence):
             print(overlaping_next, overlaping_prev)
             print(next_sequence, prev_sequence)
@@ -28,11 +28,11 @@ def greedy(sequences, full_sequence_length):
         prev_prev_len = prev_len
         next_sequence, overlaping_next = find_best_next_sequence(sequence, sequences)
         prev_sequence, overlaping_prev = find_best_prev_sequence(sequence, sequences)
-        if overlaping_next > 0 and overlaping_next >= overlaping_prev or overlaping_next > 0 and overlaping_next == overlaping_prev:
+        if overlaping_next > 0 and overlaping_next >= overlaping_prev:
             sequence += "|" + next_sequence[overlaping_next:]
             sequences.remove(next_sequence)
             sequences_used += 1
-        if overlaping_prev > 0 and overlaping_prev >= overlaping_next and overlaping_next != overlaping_prev:
+        if overlaping_prev > 0 and overlaping_prev > overlaping_next:
             sequence = prev_sequence[:-overlaping_prev] + "|" + sequence
             sequences.remove(prev_sequence)
             sequences_used += 1
@@ -82,7 +82,7 @@ if __name__ == "__main__":
     # print(find_best_prev_sequence("abc", ["bcd", "cde", "def", "efg", "fgh", "ghi", "hij", "ijk", "jkl", "klm", "lmn", "mno", "nop", "opq", "pqr", "qrs", "rst", "stu", "tuv", "uvw", "vwx", "wxy", "xyz", "yza", "zab"]))
     best_seq = ''
     best_coverage = 0
-    for i in range(100):
+    for i in range(1):
         result, coverage = greedy(data.copy(), 209)
         # print(result)
         # print(coverage)
