@@ -40,7 +40,7 @@ class Generator:
     
     def compare_next_sequences(self, sequence, next_sequence):
         best_result = 0
-        for i in range(1, len(sequence)):
+        for i in range(1, len(next_sequence)):
             if sequence[-i:] == next_sequence[:i]:
                 best_result = i
         return best_result
@@ -86,5 +86,5 @@ if __name__ == "__main__":
     individual_data = generator.generate_individual()
     print(individual_data)
 
-    individual = Individual(individual_data[1], individual_data[0], individual_data[2])
+    individual = Individual(individual_data[1], individual_data[0], individual_data[2], 209)
     print(individual.calculate_fitness)
