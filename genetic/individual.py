@@ -1,10 +1,11 @@
 import random
 
 class Individual:
-    def __init__(self, chromosome, sequence, avaible_sequences) -> None:
+    def __init__(self, chromosome, sequence, avaible_sequences, expected_length) -> None:
         self.chromosome = chromosome
         self.sequence = sequence
         self.avaible_sequences = avaible_sequences
+        self.expected_length = expected_length
         self.fitness = self.calculate_fitness()
 
     def __repr__(self) -> str:
@@ -17,7 +18,7 @@ class Individual:
     def calculate_fitness(self):
         seq_used = len(self.chromosome)
         full_seq_len = len(self.sequence)
-        return seq_used / full_seq_len
+        return (seq_used - (abs(full_seq_len - self.expected_length))) / full_seq_len
 
     def crossover(self, otherIndividual):
         cutting_place = random.randint(len(self.sequence))
