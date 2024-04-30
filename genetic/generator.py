@@ -14,7 +14,7 @@ class Generator:
         chromosome = []
         index = random.randint(0, len(self.sequences) - 1)
         sequence = self.sequences[index]
-        chromosome.append((index, 0))
+        chromosome.append((index, -1))
 
         while len(sequence) < self.full_sequence_length:
             random_direction = random.choice(["next", "prev"])
@@ -90,6 +90,6 @@ if __name__ == "__main__":
     print(individual.calculate_fitness)
     other_individual = Individual(individual_data[1], individual_data[0], individual_data[2], 209)
     print("Crossover:")
-    new_chromosome = individual.crossover(other_individual)
-    print(new_chromosome)
+    new_individual = individual.crossover(other_individual)
+    print(new_individual)
     
