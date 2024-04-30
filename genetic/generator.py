@@ -1,4 +1,5 @@
 import random
+from individual import Individual
 
 
 class Generator:
@@ -13,27 +14,27 @@ class Generator:
         chromosome = []
         index = random.randint(0, len(self.sequences) - 1)
         sequence = self.sequences[index]
-        chromosome.append(index)
+        chromosome.append((index, 0))
 
         while len(sequence) < self.full_sequence_length:
             random_direction = random.choice(["next", "prev"])
             random_addition = random.choice(["random", "best"])
             if random_addition == "random":
-                index, overlaping = self.find_random_sequence(sequence, chromosome, random_direction)
+                index, overlaping = self.find_random_sequence(sequence, chromosome[0], random_direction)
             elif random_addition == "best":
-                index, overlaping = self.find_best_sequence(sequence, chromosome, random_direction)
+                index, overlaping = self.find_best_sequence(sequence, chromosome[0], random_direction)
 
             if index == -1:
                 break
 
             if random_direction == "next":
                 sequence += "|" + self.sequences[index][overlaping:]
-                chromosome.append(index)
+                chromosome.append((index, overlaping))
             elif random_direction == "prev":
                 sequence = self.sequences[index][:-overlaping] + "|" + sequence
-                chromosome.insert(0, index)
+                chromosome.insert(0, (index, overlaping))
 
-        return sequence, chromosome
+        return sequence, chromosome, self.sequences
 
 
     
@@ -82,5 +83,8 @@ if __name__ == "__main__":
     randoms = generator.find_random_sequence("AAAAAAAAAA", [], "prev")
     print(best, generator.sequences[best[0]])
     print(randoms, generator.sequences[randoms[0]])
-    individual = generator.generate_individual()
-    print(individual)
+    individual_data = generator.generate_individual()
+    print(individual_data)
+
+    individual = Individual(individual_data[1], individual_data[0], individual_data[2])
+    print(individual.calculate_fitness)
