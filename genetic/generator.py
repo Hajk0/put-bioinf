@@ -14,7 +14,7 @@ class Generator:
         chromosome = []
         index = random.randint(0, len(self.sequences) - 1)
         sequence = self.sequences[index]
-        chromosome.append((index, 0))
+        chromosome.append((index, -1))
 
         while len(sequence) < self.full_sequence_length:
             random_direction = random.choice(["next", "prev"])
@@ -28,10 +28,10 @@ class Generator:
                 break
 
             if random_direction == "next":
-                sequence += "|" + self.sequences[index][overlaping:]
+                sequence += self.sequences[index][overlaping:]
                 chromosome.append((index, overlaping))
             elif random_direction == "prev":
-                sequence = self.sequences[index][:-overlaping] + "|" + sequence
+                sequence = self.sequences[index][:-overlaping] + sequence
                 chromosome.insert(0, (index, overlaping))
 
         return sequence, chromosome, self.sequences
@@ -88,3 +88,8 @@ if __name__ == "__main__":
 
     individual = Individual(individual_data[1], individual_data[0], individual_data[2], 209)
     print(individual.calculate_fitness)
+    other_individual = Individual(individual_data[1], individual_data[0], individual_data[2], 209)
+    print("Crossover:")
+    new_individual = individual.crossover(other_individual)
+    print(new_individual)
+    
