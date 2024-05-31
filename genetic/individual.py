@@ -1,5 +1,5 @@
 import random
-
+3
 class Individual:
     def __init__(self, chromosome, sequence, avaible_sequences, expected_length) -> None:
         self.chromosome = chromosome # List of tuples (index, overlaping)
@@ -39,36 +39,39 @@ class Individual:
 
     def crossover(self, otherIndividual):
         new_chromosome = []
-        chromosomes_fit = 0
-        while chromosomes_fit == 0:
-            new_chromosome = []
-            unavailable_indexes = []
-            random_cut = random.randint(0, len(self.chromosome) - 1)
-            for i in range(random_cut):
-                new_chromosome.append(self.chromosome[i])
-                unavailable_indexes.append(self.chromosome[i][0])
+        unavailable_indexes = set()
+        random_cut = random.randint(0, len(self.chromosome) - 1)
+        
+        for i in range(random_cut):
+            new_chromosome.append(self.chromosome[i])
+            unavailable_indexes.add(self.chromosome[i][0])
 
-            if otherIndividual.chromosome[random_cut][0] not in unavailable_indexes:
-                chromosomes_fit = self.check_fit(self.avaible_sequences[self.chromosome[random_cut][0]], self.avaible_sequences[otherIndividual.chromosome[random_cut][0]])
-            else:
-                chromosomes_fit = 0
-
-            tries = 0
-            while chromosomes_fit < 0 and otherIndividual.chromosome[random_cut][0] in unavailable_indexes and random_cut - tries > 0:
-                fit = self.check_fit(self.avaible_sequences[self.chromosome[random_cut][0]], self.avaible_sequences[otherIndividual.chromosome[random_cut - tries][0]])
-
-            if chromosomes_fit == 0:
-                continue
-            
-            for i in range(random_cut, len(otherIndividual.chromosome)):
-                if otherIndividual.chromosome[i][0] not in unavailable_indexes:
+        for i in range(random_cut, len(otherIndividual.chromosome)):
+            if otherIndividual.chromosome[i][0] not in unavailable_indexes:
+                if new_chromosome:
                     fit = self.check_fit(self.avaible_sequences[new_chromosome[-1][0]], self.avaible_sequences[otherIndividual.chromosome[i][0]])
-                    new_chromosome[-1] = (new_chromosome[-1][0], fit)
+                    new_chromosome.append((otherIndividual.chromosome[i][0], fit))
+                else:
                     new_chromosome.append(otherIndividual.chromosome[i])
-                    unavailable_indexes.append(otherIndividual.chromosome[i][0])
+                unavailable_indexes.add(otherIndividual.chromosome[i][0])
 
         new_individual = Individual(new_chromosome, "", self.avaible_sequences, self.expected_length)
         return new_individual
+
+    def mutate(self, mutation_rate=0.01):
+        for i in range(len(self.chromosome)):
+            if random.random() < mutation_rate:
+                new_index = random.randint(0, len(self.avaible_sequences) - 1)
+                if new_index not in [c[0] for c in self.chromosome]:
+                    fit = self.check_fit(self.avaible_sequences[self.chromosome[i - 1][0]], self.avaible_sequences[new_index])
+                    self.chromosome[i] = (new_index, fit)
+        self.update_sequence()
+        self.fitness = self.calculate_fitness()
+
+    def calculate_fitness(self):
+        seq_used = len(self.chromosome)
+        full_seq_len = len(self.sequence)
+        return (seq_used - (abs(full_seq_len - self.expected_length))) / full_seq_len
 
     def check_fit(self, left_sequence, right_sequence):
         best_result = 0

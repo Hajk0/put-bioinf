@@ -78,7 +78,7 @@ class Generator:
 
 
 if __name__ == "__main__":
-    generator = Generator(".\\data\\sequences_negative.txt", 209)
+    generator = Generator("../data/sequences_negative.txt", 209)
     best = generator.find_best_sequence("AAAAAAAAAA", [], "next")
     randoms = generator.find_random_sequence("AAAAAAAAAA", [], "prev")
     print(best, generator.sequences[best[0]])
