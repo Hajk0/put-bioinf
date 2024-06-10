@@ -30,16 +30,60 @@ class Population:
                 except Exception as e:
                     print(f"Error during crossover/mutation: {e}")
             self.individuals = new_individuals
+            # self.delete_worst_individuals()
+            # print(self.num_individuals)
             self.update_best_individual()
+            print(self.best_individual.fitness)
             #print(f"Generation {gen + 1}: Best fitness = {self.best_fitness}")
+
+    def evolve2(self, generations=100, selection_rate=0.5, mutation_rate_individual=0.2, mutation_rate_gene=1):
+        self.sort_individuals()
+        for gen in range(generations):
+            free_spots = int(self.num_individuals * selection_rate)
+            self.individuals = self.individuals[:free_spots]
+            for child in range(free_spots, self.num_individuals):
+                parent1 = self.tournament_selection(1)
+                parent2 = self.tournament_selection(1)
+                #try:
+                child = parent1.crossover(parent2)
+                ## Mutate only child
+                child.mutate2(1)
+                ##
+                self.individuals.append(child)
+                #except Exception as e:
+                #    print(f"Error during crossover/mutation: {e}")
+            ## Mutate all individuals
+            for i in range(1, len(self.individuals)): # Skip the best individual
+                if random.random() < mutation_rate_individual:
+                    self.individuals[i].mutate2(mutation_rate_gene)
+            ##
+            self.sort_individuals()
+            self.update_best_individual()
+            if gen % 1000 == 0:
+                print(f"Generation {gen + 1}: Best fitness = {self.best_fitness}")
+                self.print_head()
+
+
+    def sort_individuals(self):
+        self.individuals = sorted(self.individuals, key=lambda x: x.fitness, reverse=True)
 
     def tournament_selection(self, tournament_size=5):
         tournament = random.sample(self.individuals, tournament_size)
         best = max(tournament, key=lambda x: x.fitness)
         return best
 
+    def delete_worst_individuals(self):
+        num_to_delete = len(self.individuals) - self.num_individuals
+        self.individuals = sorted(self.individuals, key=lambda x: x.fitness, reverse=True)
+        self.individuals = self.individuals[num_to_delete:]
+
     def update_best_individual(self):
         best = max(self.individuals, key=lambda x: x.fitness)
         if best.fitness > self.best_fitness:
             self.best_individual = best
             self.best_fitness = best.fitness
+            print("New best individual found!", self.best_fitness)
+
+    def print_head(self):
+        for i in range(10):
+            print(i, ":", self.individuals[i].fitness)

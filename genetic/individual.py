@@ -15,6 +15,7 @@ class Individual:
         STR += f"\nChromosome: {self.chromosome}"
         STR += f"\nSequence: {self.sequence}" 
         STR += f"\nFitness: {self.fitness}"
+        STR += f"\nSequence length: {len(self.sequence)}"
         return STR
     
     def normalize_chromosome(self):
@@ -65,6 +66,60 @@ class Individual:
                 if new_index not in [c[0] for c in self.chromosome]:
                     fit = self.check_fit(self.avaible_sequences[self.chromosome[i - 1][0]], self.avaible_sequences[new_index])
                     self.chromosome[i] = (new_index, fit)
+        self.update_sequence()
+        self.fitness = self.calculate_fitness()
+
+    def mutate2(self, mutation_rate=0.05):
+        if random.random() < mutation_rate:
+            # i = random.randint(0, len(self.chromosome) - 1)
+            random_operation = random.randint(0, 2)
+            if random_operation == 0: # Change sequence
+                i = random.randint(0, len(self.chromosome) - 1)
+                new_index = random.randint(0, len(self.avaible_sequences) - 1)
+                while new_index in [c[0] for c in self.chromosome]:
+                    new_index = random.randint(0, len(self.avaible_sequences) - 1)
+                if new_index not in [c[0] for c in self.chromosome]:
+                    if i == 0: # First sequence
+                        fit = self.check_fit(self.avaible_sequences[new_index], self.avaible_sequences[self.chromosome[i + 1][0]])
+                        self.chromosome[i] = (new_index, fit)
+                    elif i == len(self.chromosome) - 1: # Last sequence
+                        fit_prev = self.check_fit(self.avaible_sequences[self.chromosome[i - 1][0]], self.avaible_sequences[new_index])
+                        self.chromosome[i - 1] = (new_index, fit_prev)
+                        self.chromosome[i] = (new_index, 0)
+                    else: # Middle sequences
+                        fit_prev = self.check_fit(self.avaible_sequences[self.chromosome[i - 1][0]], self.avaible_sequences[new_index])
+                        fit = self.check_fit(self.avaible_sequences[new_index], self.avaible_sequences[self.chromosome[i + 1][0]])
+                        self.chromosome[i - 1] = (new_index, fit_prev)
+                        self.chromosome[i] = (new_index, fit)
+            elif random_operation == 1: # Delete sequence
+                i = random.randint(0, len(self.chromosome) - 1)
+                deleted_index = random.randint(0, len(self.chromosome) - 1)
+                if deleted_index == 0:
+                    self.chromosome.pop(deleted_index)
+                elif deleted_index == len(self.chromosome) - 1:
+                    self.chromosome.pop(deleted_index - 1)
+                    self.chromosome[deleted_index - 1] = (self.chromosome[deleted_index - 1][0], 0)
+                else:
+                    fit = self.check_fit(self.avaible_sequences[self.chromosome[deleted_index - 1][0]], self.avaible_sequences[self.chromosome[deleted_index + 1][0]])
+                    self.chromosome[deleted_index - 1] = (self.chromosome[deleted_index - 1][0], fit)
+                    self.chromosome.pop(deleted_index)
+            elif random_operation == 2: # Add sequence
+                i = random.randint(0, len(self.chromosome)) #
+                new_index = random.randint(0, len(self.avaible_sequences) - 1)
+                while new_index in [c[0] for c in self.chromosome]:
+                    new_index = random.randint(0, len(self.avaible_sequences) - 1)
+                if i == 0: # First sequence
+                    fit = self.check_fit(self.avaible_sequences[new_index], self.avaible_sequences[self.chromosome[i][0]])
+                    self.chromosome.insert(i, (new_index, fit))
+                elif i == len(self.chromosome): # Last sequence
+                    fit_prev = self.check_fit(self.avaible_sequences[self.chromosome[i - 1][0]], self.avaible_sequences[new_index])
+                    self.chromosome[i - 1] = (self.chromosome[i - 1][0], fit_prev)
+                    self.chromosome.append((new_index, 0))
+                else: # Middle sequences
+                    fit_prev = self.check_fit(self.avaible_sequences[self.chromosome[i - 1][0]], self.avaible_sequences[new_index])
+                    fit = self.check_fit(self.avaible_sequences[new_index], self.avaible_sequences[self.chromosome[i][0]])
+                    self.chromosome[i - 1] = (self.chromosome[i - 1][0], fit_prev)
+                    self.chromosome.insert(i, (new_index, fit))
         self.update_sequence()
         self.fitness = self.calculate_fitness()
 
