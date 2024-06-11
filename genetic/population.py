@@ -64,6 +64,39 @@ class Population:
                 print(f"Generation {gen + 1}: Best fitness = {self.best_fitness}")
                 self.print_head()
 
+    def evolve_if_progress(self, generations=10000, selection_rate=0.8, mutation_rate_individual=0.01, mutation_rate_gene=1, skip_best=10):
+        self.sort_individuals()
+        generations_without_progress = 0
+        gen = 0
+        while generations_without_progress < generations:
+            free_spots = int(self.num_individuals * selection_rate)
+            self.individuals = self.individuals[:free_spots]
+            for child in range(free_spots, self.num_individuals):
+                parent1 = self.tournament_selection(1)
+                parent2 = self.tournament_selection(1)
+                #try:
+                child = parent1.crossover(parent2)
+                ## Mutate only child
+                # for i in range(int(mutation_rate_individual * len(child.chromosome))):
+                child.mutate2(mutation_rate_gene)
+                ##
+                self.individuals.append(child)
+                #except Exception as e:
+                #    print(f"Error during crossover/mutation: {e}")
+            ## Mutate all individuals
+            for i in range(skip_best, len(self.individuals)): # Skip the best individuals
+                if random.random() < mutation_rate_individual:
+                    self.individuals[i].mutate2(mutation_rate_gene)
+            ##
+            self.sort_individuals()
+            self.update_best_individual()
+            if gen % 1000 == 0:
+                print(f"Generation {gen + 1}: Best fitness = {self.best_fitness}")
+                self.print_head()
+            
+            gen += 1
+            generations_without_progress += 1
+        
 
     def sort_individuals(self):
         self.individuals = sorted(self.individuals, key=lambda x: x.fitness, reverse=True)
