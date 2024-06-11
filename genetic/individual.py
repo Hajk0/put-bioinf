@@ -72,13 +72,19 @@ class Individual:
     def mutate2(self, mutation_rate=0.05):
         if random.random() < mutation_rate:
             # i = random.randint(0, len(self.chromosome) - 1)
-            random_operation = random.randint(0, 2)
+            sequences_used = [c[0] for c in self.chromosome]
+            if len(sequences_used) < len(self.avaible_sequences): # if there are still sequences to add
+                random_operation = random.randint(0, 2)
+            else: # if there are no sequences to add
+                random_operation = 1 # can only delete
+
             if random_operation == 0: # Change sequence
                 i = random.randint(0, len(self.chromosome) - 1)
                 new_index = random.randint(0, len(self.avaible_sequences) - 1)
-                while new_index in [c[0] for c in self.chromosome]:
-                    new_index = random.randint(0, len(self.avaible_sequences) - 1)
-                if new_index not in [c[0] for c in self.chromosome]:
+                while new_index in sequences_used:
+                    new_index += 1 # random.randint(0, len(self.avaible_sequences) - 1)
+                    new_index %= len(self.avaible_sequences)
+                if new_index not in sequences_used:
                     if i == 0: # First sequence
                         fit = self.check_fit(self.avaible_sequences[new_index], self.avaible_sequences[self.chromosome[i + 1][0]])
                         self.chromosome[i] = (new_index, fit)
@@ -106,7 +112,7 @@ class Individual:
             elif random_operation == 2: # Add sequence
                 i = random.randint(0, len(self.chromosome)) #
                 new_index = random.randint(0, len(self.avaible_sequences) - 1)
-                while new_index in [c[0] for c in self.chromosome]:
+                while new_index in sequences_used:
                     new_index = random.randint(0, len(self.avaible_sequences) - 1)
                 if i == 0: # First sequence
                     fit = self.check_fit(self.avaible_sequences[new_index], self.avaible_sequences[self.chromosome[i][0]])
@@ -120,6 +126,16 @@ class Individual:
                     fit = self.check_fit(self.avaible_sequences[new_index], self.avaible_sequences[self.chromosome[i][0]])
                     self.chromosome[i - 1] = (self.chromosome[i - 1][0], fit_prev)
                     self.chromosome.insert(i, (new_index, fit))
+            elif random_operation == 3: # Switch sequences (not used)
+                i = random.randint(0, len(self.chromosome) - 1)
+                j = random.randint(0, len(self.chromosome) - 1)
+                while i == j:
+                    j = random.randint(0, len(self.chromosome) - 1)
+                fit_i_prev = self.check_fit(self.avaible_sequences[self.chromosome[i - 1][0]], self.avaible_sequences[self.chromosome[j][0]])
+                fit_i = self.check_fit(self.avaible_sequences[self.chromosome[i][0]], self.avaible_sequences[self.chromosome[j + 1][0]])
+                fit_j_prev = self.check_fit(self.avaible_sequences[self.chromosome[j - 1][0]], self.avaible_sequences[self.chromosome[i][0]])
+                fit_j = self.check_fit(self.avaible_sequences[self.chromosome[j][0]], self.avaible_sequences[self.chromosome[i + 1][0]])
+                
         self.update_sequence()
         self.fitness = self.calculate_fitness()
 

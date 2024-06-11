@@ -20,7 +20,7 @@ def crossover_test():
 #"../data/sequences_negative_long.txt"
 def population_test():
     population = Population(100, "../data/sequences_negative.txt", 209)
-    population.evolve2(generations=100000, selection_rate=0.6, mutation_rate_individual=0.5, mutation_rate_gene=0.01)
+    population.evolve2(generations=100000, selection_rate=0.65, mutation_rate_individual=0.001, mutation_rate_gene=1, skip_best=5)
     print("Best individual:", population.best_individual)
 
 if __name__ == "__main__":

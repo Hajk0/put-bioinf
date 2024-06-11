@@ -36,7 +36,7 @@ class Population:
             print(self.best_individual.fitness)
             #print(f"Generation {gen + 1}: Best fitness = {self.best_fitness}")
 
-    def evolve2(self, generations=100, selection_rate=0.5, mutation_rate_individual=0.2, mutation_rate_gene=1):
+    def evolve2(self, generations=100, selection_rate=0.8, mutation_rate_individual=0.001, mutation_rate_gene=1, skip_best=10):
         self.sort_individuals()
         for gen in range(generations):
             free_spots = int(self.num_individuals * selection_rate)
@@ -47,13 +47,14 @@ class Population:
                 #try:
                 child = parent1.crossover(parent2)
                 ## Mutate only child
-                child.mutate2(1)
+                # for i in range(int(mutation_rate_individual * len(child.chromosome))):
+                child.mutate2(mutation_rate_gene)
                 ##
                 self.individuals.append(child)
                 #except Exception as e:
                 #    print(f"Error during crossover/mutation: {e}")
             ## Mutate all individuals
-            for i in range(1, len(self.individuals)): # Skip the best individual
+            for i in range(skip_best, len(self.individuals)): # Skip the best individuals
                 if random.random() < mutation_rate_individual:
                     self.individuals[i].mutate2(mutation_rate_gene)
             ##

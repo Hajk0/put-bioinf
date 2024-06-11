@@ -19,10 +19,11 @@ class Generator:
         while len(sequence) < self.full_sequence_length:
             random_direction = random.choice(["next", "prev"])
             random_addition = random.choice(["random", "best"])
+            random_addition = "best"#
             if random_addition == "random":
-                index, overlaping = self.find_random_sequence(sequence, chromosome[0], random_direction)
+                index, overlaping = self.find_random_sequence(sequence, [c[0] for c in chromosome], random_direction) # chromosome[0]
             elif random_addition == "best":
-                index, overlaping = self.find_best_sequence(sequence, chromosome[0], random_direction)
+                index, overlaping = self.find_best_sequence(sequence, [c[0] for c in chromosome], random_direction)
 
             if index == -1:
                 break
