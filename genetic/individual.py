@@ -47,6 +47,8 @@ class Individual:
             new_chromosome.append(self.chromosome[i])
             unavailable_indexes.add(self.chromosome[i][0])
 
+        chromosome_self = [c[0] for c in self.chromosome]
+        chromosome_other = [c[0] for c in otherIndividual.chromosome]
         for i in range(random_cut, len(otherIndividual.chromosome)):
             if otherIndividual.chromosome[i][0] not in unavailable_indexes:
                 if new_chromosome:
@@ -55,6 +57,22 @@ class Individual:
                 else:
                     new_chromosome.append(otherIndividual.chromosome[i])
                 unavailable_indexes.add(otherIndividual.chromosome[i][0])
+            else:
+                random_index = random.randint(0, len(self.avaible_sequences) - 1)
+                start_index = random_index
+                found = True
+
+                while random_index in chromosome_self or random_index in chromosome_other:
+                    random_index += 1
+                    random_index %= len(self.avaible_sequences)
+                    if random_index == start_index:
+                        found = False
+                        break
+                if found:
+                    fit = self.check_fit(self.avaible_sequences[new_chromosome[-1][0]], self.avaible_sequences[random_index])
+                    if fit > 3:
+                        new_chromosome.append((random_index, fit))
+                        unavailable_indexes.add(random_index)
 
         new_individual = Individual(new_chromosome, "", self.avaible_sequences, self.expected_length)
         return new_individual
@@ -98,7 +116,6 @@ class Individual:
                         self.chromosome[i - 1] = (new_index, fit_prev)
                         self.chromosome[i] = (new_index, fit)
             elif random_operation == 1: # Delete sequence
-                i = random.randint(0, len(self.chromosome) - 1)
                 deleted_index = random.randint(0, len(self.chromosome) - 1)
                 if deleted_index == 0:
                     self.chromosome.pop(deleted_index)
@@ -126,15 +143,6 @@ class Individual:
                     fit = self.check_fit(self.avaible_sequences[new_index], self.avaible_sequences[self.chromosome[i][0]])
                     self.chromosome[i - 1] = (self.chromosome[i - 1][0], fit_prev)
                     self.chromosome.insert(i, (new_index, fit))
-            elif random_operation == 3: # Switch sequences (not used)
-                i = random.randint(0, len(self.chromosome) - 1)
-                j = random.randint(0, len(self.chromosome) - 1)
-                while i == j:
-                    j = random.randint(0, len(self.chromosome) - 1)
-                fit_i_prev = self.check_fit(self.avaible_sequences[self.chromosome[i - 1][0]], self.avaible_sequences[self.chromosome[j][0]])
-                fit_i = self.check_fit(self.avaible_sequences[self.chromosome[i][0]], self.avaible_sequences[self.chromosome[j + 1][0]])
-                fit_j_prev = self.check_fit(self.avaible_sequences[self.chromosome[j - 1][0]], self.avaible_sequences[self.chromosome[i][0]])
-                fit_j = self.check_fit(self.avaible_sequences[self.chromosome[j][0]], self.avaible_sequences[self.chromosome[i + 1][0]])
                 
         self.update_sequence()
         self.fitness = self.calculate_fitness()

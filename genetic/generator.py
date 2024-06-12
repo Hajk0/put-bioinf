@@ -10,7 +10,7 @@ class Generator:
             for line in file:
                 self.sequences.append(line.strip())
 
-    def generate_individual(self):
+    def generate_individual(self, random_probability=0.1):
         chromosome = []
         index = random.randint(0, len(self.sequences) - 1)
         sequence = self.sequences[index]
@@ -18,11 +18,9 @@ class Generator:
 
         while len(sequence) < self.full_sequence_length:
             random_direction = random.choice(["next", "prev"])
-            random_addition = random.choice(["random", "best"])
-            random_addition = "best"#
-            if random_addition == "random":
+            if random.random() < random_probability:
                 index, overlaping = self.find_random_sequence(sequence, [c[0] for c in chromosome], random_direction) # chromosome[0]
-            elif random_addition == "best":
+            else:
                 index, overlaping = self.find_best_sequence(sequence, [c[0] for c in chromosome], random_direction)
 
             if index == -1:
